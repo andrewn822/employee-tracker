@@ -85,3 +85,45 @@ const empQuery = async(data, data2) => {
     })
     db.query(`INSERT INTO EMPLOYEE (first_name, last_name, role_id, manager_id) VALUES ("${res.empfName}"), "${res.emplName}", "${hasRole.id}", '${hasManager.id}) `)
 }
+
+const empQuery = async(data, data2) => {
+    const res = await inquirer.prompt([{
+        type: "input",
+        name: "empfName",
+        message; "What is the employee's first name?"
+    },{
+        type: "input",
+        name: "emplName",
+        message: "What is the employee's last name?"
+    },{
+        type: "list",
+        name: "empRole",
+        message: "Wht is the employees' role?",
+        choies: data2
+    }, {
+        type: "list",
+        name: "empMan",
+        message: "Who is the employee's manager?",
+        choices: data
+    }])
+
+    var hasManager = data.find(element => {
+        return element.name === res.empMan
+    })
+    
+    var hasRole = data2.find(el => {
+        return el.name === res.empRole
+    })
+
+    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${res.empfName}", "${res.emplName}", ${hasRole.id}, ${hasManager.id})`. function(err, res){
+        init()
+    })
+}
+
+
+
+
+
+
+
+
