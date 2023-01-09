@@ -121,8 +121,41 @@ const empQuery = async(data, data2) => {
 }
 
 
+const updateQuery = async (data, data2) => {
+    const res = await inquirer.prompt([{
+        type: 'list',
+        name: 'updateEmp',
+        message: 'Which employee would you like to update?',
+        choices: data
+    }, {
+        type: 'list',
+        name: 'updateEmpRole',
+        message: "What is the employee's new role?",
+        choices: data2
+    }])
 
+    const empEl = data.find( el => {
+        return el.name === res.updateEmp
+    })
 
+    const empElID = empEl.id
+
+    const roleEl = data2.find(el => {
+        return el.name === res.updateEmpRole
+    })
+
+    const roleElID = roleEl.id
+
+    const sql = `UPDATE employee SET role_id = ? WHERE id = ?`
+    const params = [roleElID, empElID]
+    db.query(sql, params, (err, result) => {
+        if (err) {
+            console.error(err)
+        } else {
+            init();
+        }
+    })
+}
 
 
 
