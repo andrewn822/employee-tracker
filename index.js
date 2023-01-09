@@ -158,5 +158,79 @@ const updateQuery = async (data, data2) => {
 }
 
 
+const init = async () => {
+    const res = await inquirer.prompt(initPrompt)
 
+    if (res.initAction === 'view all departments') {
+        db.query('SELECT * FROM department', function (err, results){
+
+            console.table(restuls)
+            init();
+        })
+    }
+
+    if (res.initAction === 'view all roles'){
+        db.query('SELECT role.id, role.title, role.salary FROM role LEFT JOIN department ON role.department_id = department.id ', function (err, results){
+            console.table(results)
+            init();
+        })
+    }
+
+
+    if (res.initAction === 'view all employees'){
+        db.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(Manager.first_name, " ", Manager.last_name) as manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON department.id = role.department_id LEFT JOIN employee as Manager ON employee.manager_id = Manager.id', function (err, results){
+            console.table(results)
+            init();
+        })
+    }
+
+    if (res.initAction === 'add a department'){
+        console.log('running department prompt...')
+        deptQuery();
+    }
+
+    if (res.initAction === 'add a role'){
+        console.log('running role prompt...')
+        db.query('SELECT * FROM department', function (err, res) {
+            roleQuery(res);
+        })
+        
+    }
+
+    if (res.initAction === 'add an employee'){
+        console.log('running employee prompt...')
+        db.query('SELECT CONCAT (employee.first_name, " ", employee.last_name) as name, employee.id FROM employee WHERE manager_id IS NULL' , function (err, res) {
+            db.query('SELECT title as name, id FROM role', function(err, res2){
+                empQuery(res, res2)
+            })
+            
+        })
+        
+    }
+
+    if (res.initAction === 'update an employee role'){
+        console.log('running update prompt...')
+        db.query('SELECT CONCAT(employee.first_name, " ", employee.last_name) as name, manager_id, role_id, id FROM employee', function (err, empRes) {
+            db.query('SELECT title as name, id FROM role', function(err, roleRes) {
+                if (err)  {
+                    console.error(err)
+                }
+                updateQuery(empRes, roleRes)
+            })
+            
+        })
+    }
+    if (res.initAction === 'exit application'){
+        return exit()
+    }
+    return
+
+
+
+
+
+
+}
+
+init();
 
