@@ -15,10 +15,10 @@ const db = mysql.createConnection (
 );
 
 const initPrompt = [{
-    type: 'list',
-    name: 'initAction',
-    message: 'What would you like to do?',
-    choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee']
+    type: "list",
+    name: "initAction",
+    message: "what would you like to do?",
+    choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'exit application']
 }]
 
 const departmentPrompt = [{
@@ -81,10 +81,13 @@ const empQuery = async(data, data2) => {
     var hasManager = data.find(element => {
         return element.name === res.empMan
     })
-    var hasRole = data.find(el => {
+    var hasRole = data2.find(el => {
         return el.name === res.empRole
     })
-    db.query(`INSERT INTO EMPLOYEE (first_name, last_name, role_id, manager_id) VALUES ("${res.empfName}"), "${res.emplName}", "${hasRole.id}", '${hasManager.id}) `)
+    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${res.empfName}", "${res.emplName}", ${hasRole.id}, ${hasManager.id})`, 
+    function (err, res) {
+        init()
+    })
 }
 
 
@@ -125,19 +128,20 @@ const updateQuery = async (data, data2) => {
 }
 
 
-const init = async () => {
+const init = async() => {
     const res = await inquirer.prompt(initPrompt)
 
-    if (res.initAction === 'view all departments') {
+    if (res.initAction === 'view all departments'){
         db.query('SELECT * FROM department', function (err, results){
 
-            console.table(restuls)
+            console.table(results)
             init();
         })
     }
 
     if (res.initAction === 'view all roles'){
-        db.query('SELECT role.id, role.title, role.salary FROM role LEFT JOIN department ON role.department_id = department.id ', function (err, results){
+        db.query('SELECT role.id, role.title, role.salary FROM role LEFT JOIN department ON role.department_id = department.id ', function (err, results)
+        {
             console.table(results)
             init();
         })
